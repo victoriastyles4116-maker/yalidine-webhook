@@ -25,8 +25,17 @@ def send_telegram(message):
         "parse_mode": "HTML"
     })
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
+    # Yalidine CRC Validation
+    if request.method == 'GET':
+        subscribe = request.args.get('subscribe')
+        crc_token = request.args.get('crc_token')
+        if subscribe and crc_token:
+            return crc_token, 200
+        return "✅ Yalidine Webhook server is running!", 200
+
+    # POST - معالجة الأحداث
     data = request.json
     event_type = data.get('type', '')
 
@@ -53,7 +62,7 @@ def webhook():
 
 @app.route('/', methods=['GET'])
 def home():
-    return "✅ Yalidine Webhook server is running!"
+    return "✅ Yalidine Webhook server is running!", 200
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
